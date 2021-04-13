@@ -60,6 +60,22 @@ def event_loop():
 
 @pytest.fixture(scope="module")
 async def wallet_nodes():
+    async_gen = setup_simulators_and_wallets(2, 1, {"MEMPOOL_BLOCK_BUFFER": 2, "MAX_BLOCK_COST_CLVM": 10860254871})
+    nodes, wallets = await async_gen.__anext__()
+    full_node_1 = nodes[0]
+    full_node_2 = nodes[1]
+    server_1 = full_node_1.full_node.server
+    server_2 = full_node_2.full_node.server
+    wallet_a = bt.get_pool_wallet_tool()
+    wallet_receiver = WalletTool(full_node_1.full_node.constants)
+    yield full_node_1, full_node_2, server_1, server_2, wallet_a, wallet_receiver
+
+    async for _ in async_gen:
+        yield _
+
+
+@pytest.fixture(scope="module")
+async def wallet_nodes_low_max_limit():
     async_gen = setup_simulators_and_wallets(2, 1, {"MEMPOOL_BLOCK_BUFFER": 2, "MAX_BLOCK_COST_CLVM": 4000000})
     nodes, wallets = await async_gen.__anext__()
     full_node_1 = nodes[0]
@@ -420,8 +436,8 @@ class TestFullNodeProtocol:
         await time_out_assert(10, time_out_messages(incoming_queue, "request_block", 1))
 
     @pytest.mark.asyncio
-    async def test_new_transaction(self, wallet_nodes):
-        full_node_1, full_node_2, server_1, server_2, wallet_a, wallet_receiver = wallet_nodes
+    async def test_new_transaction(self, wallet_nodes_low_max_limit):
+        full_node_1, full_node_2, server_1, server_2, wallet_a, wallet_receiver = wallet_nodes_low_max_limit
         blocks = await full_node_1.get_all_full_blocks()
 
         wallet_ph = wallet_a.get_new_puzzlehash()

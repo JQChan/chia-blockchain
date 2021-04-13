@@ -175,7 +175,7 @@ async def validate_block_body(
             if cached_cost_result is not None:
                 result: Optional[CostResult] = cached_cost_result
             else:
-                result = calculate_cost_of_program(block.transactions_generator, constants.CLVM_COST_RATIO_CONSTANT)
+                result = calculate_cost_of_program(block.transactions_generator, constants.COST_PER_BYTE)
             assert result is not None
             cost = result.cost
             npc_list = result.npc_list
