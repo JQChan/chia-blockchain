@@ -43,9 +43,9 @@ testnet_kwargs = {
     # Max coin amount, fits into 64 bits
     "MAX_COIN_AMOUNT": uint64((1 << 64) - 1),
     # Max block cost in clvm cost units
-    "MAX_BLOCK_COST_CLVM": 10860254871,
+    "MAX_BLOCK_COST_CLVM": 11000000000,
     # The cost per byte of generator program
-    "COST_PER_BYTE": 12137,
+    "COST_PER_BYTE": 12000,
     "WEIGHT_PROOF_THRESHOLD": 2,
     "BLOCKS_CACHE_SIZE": 4608 + (128 * 4),
     "WEIGHT_PROOF_RECENT_BLOCKS": 1000,
