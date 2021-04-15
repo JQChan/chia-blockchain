@@ -60,7 +60,7 @@ def event_loop():
 
 @pytest.fixture(scope="module")
 async def wallet_nodes():
-    async_gen = setup_simulators_and_wallets(2, 1, {"MEMPOOL_BLOCK_BUFFER": 2, "MAX_BLOCK_COST_CLVM": 10860254871})
+    async_gen = setup_simulators_and_wallets(2, 1, {"MEMPOOL_BLOCK_BUFFER": 2})
     nodes, wallets = await async_gen.__anext__()
     full_node_1 = nodes[0]
     full_node_2 = nodes[1]
@@ -436,7 +436,7 @@ class TestFullNodeProtocol:
         await time_out_assert(10, time_out_messages(incoming_queue, "request_block", 1))
 
     @pytest.mark.asyncio
-    async def test_new_transaction(self, wallet_nodes_low_max_limit):
+    async def test_new_transaction_and_mempool(self, wallet_nodes_low_max_limit):
         full_node_1, full_node_2, server_1, server_2, wallet_a, wallet_receiver = wallet_nodes_low_max_limit
         blocks = await full_node_1.get_all_full_blocks()
 
@@ -533,11 +533,11 @@ class TestFullNodeProtocol:
             req = await full_node_1.request_transaction(request)
 
             fee_rate_for_small = full_node_1.full_node.mempool_manager.mempool.get_min_fee_rate(10)
-            fee_rate_for_med = full_node_1.full_node.mempool_manager.mempool.get_min_fee_rate(50000)
-            fee_rate_for_large = full_node_1.full_node.mempool_manager.mempool.get_min_fee_rate(500000)
+            fee_rate_for_med = full_node_1.full_node.mempool_manager.mempool.get_min_fee_rate(5000000)
+            fee_rate_for_large = full_node_1.full_node.mempool_manager.mempool.get_min_fee_rate(50000000)
             log.info(f"Min fee rate (10): {fee_rate_for_small}")
-            log.info(f"Min fee rate (50000): {fee_rate_for_med}")
-            log.info(f"Min fee rate (500000): {fee_rate_for_large}")
+            log.info(f"Min fee rate (5000000): {fee_rate_for_med}")
+            log.info(f"Min fee rate (50000000): {fee_rate_for_large}")
             if fee_rate_for_large > fee_rate_for_med:
                 seen_bigger_transaction_has_high_fee = True
 
